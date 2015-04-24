@@ -538,7 +538,8 @@
       "valueOperationKey":"default",
       "formatValueOperationCast":"operation.prototype.value=function(){ return this.A-this.B;}",
       "dataGroupPeriod":"default",
-      "dataGroupStartDate":"l"
+      "dataGroupStartDate":"default",
+      "dataGroupEndDate":"default"
     }
   },
   "includes":["/elx/lib/highcharts.js","/elx/lib/Accent2.js","/elx/lib/highchartExporting.js"],
@@ -1076,10 +1077,7 @@ elx.bundle.type.ComboChart = {
   </div>
 
 <div class='elx-script'>
-  //http://jsfiddle.net/gh/get/jquery/1.9.1/highslide-software/highcharts.com/tree/master/samples/highcharts/demo/combo/
-  //for the single mouseover
  
-
   cfgoptions=view.typeinfo;
     
   var div =$("#${id}");
@@ -1092,14 +1090,14 @@ elx.bundle.type.ComboChart = {
   var formatOrderingCast=view.typeinfo.formatOrderingCast;
     var legendKey=view.typeinfo.legendKey;
   var formatLegendCast=view.typeinfo.formatLegendCast;
-  var tooltipKey=view.typeinfo.tooltipKey;
+  var tooltipKey=view.typeinfo.toolTipKey;
   var formatToolTipCast=view.typeinfo.formatToolTipCast;
   var formatValueOperationCast=view.typeinfo.formatValueOperationCast;
   var valueOperationKey =view.typeinfo.valueOperationKey;
  
     k.forEach(function(d,i) {
     keys.push(d.name);})
-  //console.log("keysAr",JSON.stringify(keys));
+
   var columns=[]; var operations=[];
   var t=view.typeinfo.data.fields.operable.values;
     t.forEach(function(d,i) {
@@ -1107,23 +1105,6 @@ elx.bundle.type.ComboChart = {
     operations.push(d.op);
   })
 
-    /* data tab
-  
-function data(){
-    var t=view.typeinfo.data.fields.operable.values;
-  	var k=view.typeinfo.data.fields.keys;
-
-  var columns=[]; var operations=[]; var keys=[];
-  t.forEach(function(d,i) {
-  columns.push(d.name);
-    operations.push(d.op);
-  })
-  k.forEach(function(d,i) {
-    keys.push(d.name);})
-   return rows.groupBy(keys,columns, operations);
-}
-data();
-   */  
 var f=view.typeinfo.data.fields;
 
  if (view.data.jsonClass === "DataEmbedded"){ 
@@ -1131,8 +1112,9 @@ var f=view.typeinfo.data.fields;
   ["2014-01-20",32],["2014-07-20",46]];
   */
   rawdata= [["Apr",100],["Aug",60],["Dec",92],["Feb",48],["Jan",32],["Jul",46],["Jun",92],["Mar",111],["May",120],["Nov",56],["Oct",45],["Sep",44]];
+  
   } else {rawdata=${data};
-/*    var viewHolder = elx.app.dashboardFrame.getViewById(view.id);
+    var viewHolder = elx.app.dashboardFrame.getViewById(view.id);
 
 if(viewHolder){
   console.log('viewHolder...',viewHolder);
@@ -1141,9 +1123,18 @@ viewHolder.setBaseView(v);
 viewHolder.resize();
   
   }
-  */
+ 
+ /*  view.typeinfo.dataGroupPeriod='month';
+	view.typeinfo.dataGroupStartDate='10/2/2015';
+	view.typeinfo.dataGroupEndDate='28/12/2015'; */
+	//view.typeinfo.dataGroupPeriod='week';
+
    var dataGroupPeriod=view.typeinfo.dataGroupPeriod;
+   
   console.log("..dataGroupPeriod",dataGroupPeriod);
+  var dataGroupStartDate=view.typeinfo.dataGroupStartDate;
+  var dataGroupEndDate=view.typeinfo.dataGroupEndDate;
+  console.log("..startDate",dataGroupStartDate);
   }
   var Set_GroupFn1, Get_CategoryFn,average, chartGen, groupByFn, hexToModel1, smpColName, sum, 
   zeroOrOne_OperableClass;
@@ -1156,29 +1147,39 @@ viewHolder.resize();
  debugFn();
   
   console.log("rawdata",JSON.stringify(rawdata));
+  if(_.size(rawdata)==0) rawdata=[["02/04/2015","Citizen",0]];
   var data1, data2, data3, smpColName;
   data1 = arrToHex(rawdata, f, view);
-  // data1= [{"stock_group#{xaxis}":"AB","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":5298.73,"sum(Gross_Profit)#[spline.R2]":2925906.33},{"stock_group#{xaxis}":"OTHERS","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":256.92,"sum(Gross_Profit)#[spline.R2]":384715.54},{"stock_group#{xaxis}":"FB","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":2649.98,"sum(Gross_Profit)#[spline.R2]":1749060.57},{"stock_group#{xaxis}":"SQB","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":381.59,"sum(Gross_Profit)#[spline.R2]":296729.47},{"stock_group#{xaxis}":"GR","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":347.46,"sum(Gross_Profit)#[spline.R2]":452457.37},{"stock_group#{xaxis}":"P","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":254.72,"sum(Gross_Profit)#[spline.R2]":193801.56},{"stock_group#{xaxis}":"RB","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":307.27,"sum(Gross_Profit)#[spline.R2]":294954.43},{"stock_group#{xaxis}":"CH","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":4943.44,"sum(Gross_Profit)#[spline.R2]":4506888.28},{"stock_group#{xaxis}":"PL","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":14573.05,"sum(Gross_Profit)#[spline.R2]":5688634.39},{"stock_group#{xaxis}":"GC","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":0.31,"sum(Gross_Profit)#[spline.R2]":25452.83},{"stock_group#{xaxis}":"HFHS","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":1286.57,"sum(Gross_Profit)#[spline.R2]":1121954.75},{"stock_group#{xaxis}":"CFHS","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":5994.62,"sum(Gross_Profit)#[spline.R2]":3364209.06},{"stock_group#{xaxis}":"B","sum(Sold_Tonnage)#[columnInducedGroupby.L1]":51636.23,"sum(Gross_Profit)#[spline.R2]":14589162.73}];
-console.log("data1",JSON.stringify(data1));
-  
-  data2=interpolateMonthFixed(data1,view);
-  
-  console.log("data2",JSON.stringify(data2));
-  data3 = hexToModel1(data2, legendKey,formatLegendCast,view);
-  console.log('data3',JSON.stringify(data3));
+console.log('data1',JSON.stringify(data1[0]));
+
+ var rawTimeString='%d/%m/%Y';
+ 
   if( view.typeinfo.dataGroupPeriod !='default') {
-  var rawTimeString='%d/%m/%Y';
-  data3= dataGroupUsed(data3, 'category',view.typeinfo.dataGroupPeriod,view.typeinfo.dataGroupStartDate);
+    switch(view.typeinfo.dataGroupPeriod){
+  case 'day':orderingKey='%d/%m/%y';view.typeinfo.interpolateXAxisKey='default';break;
+  case 'week':orderingKey='week';view.typeinfo.interpolateXAxisKey='default'; break;
+  case 'month':orderingKey='Y-b'; view.typeinfo.interpolateXAxisKey="allMonth";break;
+  case 'year':orderingKey='Y';view.typeinfo.interpolateXAxisKey='default';break;
   }
-  console.log('before data4',JSON.stringify(data3));
+  console.log('orderingKey1',orderingKey);
+  data1=interpolateMonthFixed(data1,view);
+  
+  data3 = hexToModel1(data1, legendKey,formatLegendCast,view);
+  console.log('jess');
+  data3= dataGroupUsed(data3, 'category',view.typeinfo.dataGroupPeriod,view.typeinfo.dataGroupStartDate);
+  
+
+  } else { data1=interpolateMonthFixed(data1,view);
+   data3 = hexToModel1(data1, legendKey,formatLegendCast,view);
+   
+  }
   var data4=valueOperating(data3,valueOperationKey,formatValueOperationCast);
+  //var data4=interpolateMonthFixed(data4,view);
   var data5=formatXTicksAndOrdering(data4,view);
-  console.log("data5",JSON.stringify(data5));
   var data6=sortCategory(data5);
   smpColName = _.groupBy(data6, function(d) {
     return d["columnName"];
   });		
-  console.log("initialSmpColName",JSON.stringify(smpColName));
    var toCategoryArray=Get_CategoryFn(smpColName);
   smpGroupby1=_.groupBy(data6,function(d) {
   	return d["groupby1"];
@@ -1193,15 +1194,11 @@ console.log("data1",JSON.stringify(data1));
   var smpGroupbySize=_.size(smpGroupby1);
   }
 
- 
-   
-  //console.log("smpColName",JSON.stringify(smpColName));
+ console.log('smpColName',smpColName);
   console.log("toCategoryArray",JSON.stringify(toCategoryArray));
   var toSeriesArray=[];var output={};model_APIClass={};
   var containsModelType; //Requires rearranging toSeries because of linked series
-    console.log('before smpColName',smpColName);
   chartGen(smpColName,model_APIClass,output);
-  console.log('output',output);
   for (var propertyName in output) {
     if (Array.isArray(output[propertyName])==true) {
     _.each(output[propertyName],function(d,i){
@@ -1210,16 +1207,15 @@ console.log("data1",JSON.stringify(data1));
   	  }
   	else toSeriesArray.push(output[propertyName]);
   }
-  console.log('before Rearrange',toSeriesArray);
       toSeriesArray=reArrangeToSeries(toSeriesArray,containsModelType);
 		
 	//Set YAxis
 		var toYaxisArray=[];
   var yAxisArray=(view.typeinfo.yAxisArray).split(",");
   var colorSeriesArray=(view.typeinfo.colorSeriesArray).split(",");
+  if (containsModelType!='pie'){
    set_yAxisFnBySeries(toSeriesArray,toYaxisArray,yAxisArray,model_APIClass,colorSeriesArray);
-  
-  //console.log("output",JSON.stringify(output));
+  }
   console.log("toSeriesArray",JSON.stringify(toSeriesArray));
   console.log("toYaxisArray",JSON.stringify(toYaxisArray));
   console.log("colorSeriesArray",JSON.stringify(colorSeriesArray));
@@ -1263,25 +1259,43 @@ console.log("data1",JSON.stringify(data1));
                     }
 		}
       },
-      series: toSeriesArray
-    });
-  // //console.log("jess",model_APIClass);
+      series: toSeriesArray,credits:{enabled: false},
+	  legend:{margin:1,maxHeight:70}
+  });
  function debugFn(){
     
    interpolateMonthFixed=function(data,view){
-  if (view.typeinfo.interpolateXAxis=="Yes") {
-  var categoryName; var valueNames=[];
+   var data2=data;
+  if (view.typeinfo.interpolateXAxisKey=="allMonth" && _.str.include(orderingKey,'-')==true) {
+  console.log('data[0]',data2[0]);
+    console.log('orderingKey2',orderingKey);
+  var categoryName; var valueNames=[]; var colNames=[];
   var monthFormat=d3.time.format("%b");
   var yearFormat=d3.time.format("%Y");
+  var yearMonthFormat=d3.time.format("%Y-%b");
   var dayFormat=d3.time.format("%e");
+  var minYear=parseInt(yearFormat(d3.time.format(rawTimeString).parse(dataGroupStartDate)));
+  var maxYear=parseInt(yearFormat(d3.time.format(rawTimeString).parse(dataGroupEndDate)))+1;
+  var yearArr=_.range(minYear,maxYear);
   
-  var fixedCategory=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  for (var propertyName in data[0]) {
-  if(propertyName.contains("#{xaxis}") ==true) categoryName=propertyName;
-  else  valueNames.push(propertyName);
+  var fixedCategoryMonth=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var fixedCategory=[];
+  _.each(yearArr,function(Y,i){ _.each(fixedCategoryMonth,function(b,n){
+  
+  var splitOrd=orderingKey.split("-");
+  var stringToEval='var j='+splitOrd[0]+'+"-"+'+splitOrd[1];
+  eval(stringToEval);
+	fixedCategory.push(j);
+  });});
+  
+  for (var propertyName in data2[0]) {
+  if(_.str.include(propertyName,"#{xaxis}")) categoryName=propertyName;
+  else  if (_.str.include(propertyName,'#[')) valueNames.push(propertyName);
+  else colNames.push([propertyName,data2[0][propertyName]]);
   }
   //auto detect
-  var sampleCategory=data[0][categoryName];
+  var sampleCategory=data2[0][categoryName];
+  console.log('sampleCategory',sampleCategory);
    var autoDetectArray=['parsableDate','month'];
   var detected;
   var detected2='month';
@@ -1291,32 +1305,39 @@ console.log("data1",JSON.stringify(data1));
   if (autoDetectCategory[j](sampleCategory)) {detected=j; 
    break;}
   }
+  console.log('detected',detected);
    if (typeof detected =='undefined') detected ='normal';
   //--
   if (detected=='parsableDate') {
-  
-  var existingCat=_.uniq(_.pluck(data,categoryName));
+  var existingCat1=_.uniq(_.pluck(data2,categoryName));
   var existingCatTemp=[];
-  _.each(existingCat,function(d) {
-    var date= new Date(d);
-  existingCatTemp.push(monthFormat(date));});
-  existingCat=existingCatTemp;}
-  else var existingCat=_.uniq(_.pluck(data,categoryName));
+  _.each(existingCat1,function(d) {
+    var date=d3.time.format(rawTimeString).parse(d);
+  existingCatTemp.push(yearMonthFormat(date));});
+  existingCat=_.uniq(existingCatTemp); 
+	}
+  else var existingCat=_.uniq(_.pluck(data2,categoryName));
+  
   var newCat=_.difference(fixedCategory,existingCat);
-    var newObj={};
-
+  console.log('existingCat',JSON.stringify(existingCat), 'newCat',JSON.stringify(newCat),'fixedCategory',JSON.stringify(fixedCategory));
   _.each(newCat,function(d,i) {
-  	newObj.categoryName=d;
+     var newObj={};
+  	newObj[categoryName]=d3.time.format(rawTimeString)(d3.time.format("%Y-%b").parse(d));
     _.each(valueNames,function(m,n) {
   	newObj[m]=0;
     });
+	_.each(colNames,function(j,k){
+	var propertyName=j[0];
+	newObj[propertyName]=j[1];
+	});
+	//check if newobj is inside the tDomain
+	var newObjDate=d3.time.format(rawTimeString).parse(newObj[categoryName]);
+	if(newObjDate>= d3.time.format(rawTimeString).parse(dataGroupStartDate)
+	&& newObjDate<=d3.time.format(rawTimeString).parse(dataGroupEndDate)){
+	  data2.push(newObj);}
   });
-  
-   
-  if(jQuery.isEmptyObject(newObj)===false&& detected!=='parsableDate') {data.push(newObj);}
- 
-  } return data;
-  }
+    } return data2;
+  };
   Get_CategoryFn=function(smpColName) {
   _.each(smpColName,function(t,unit){
      if(unit==_.first(Object.keys(smpColName))) {
@@ -1344,7 +1365,8 @@ console.log("data1",JSON.stringify(data1));
   columnStackPercent:['column'],
   columnInducedGroupby:['column'],
   areaStackPercent:['area'],
-  dotGroupby:['spline']
+  dotGroupby:['spline'],
+  pie:[,,'pie']
     };
   model_APIClass={
   
@@ -1394,6 +1416,22 @@ model_DataConvertClass = {
     },
     1: function(t,unit, index) {},
     2: function(t, unit,index) {
+      var name_pie, totalValue_pie, valueData;
+      valueData = _.pluck(t, "value");
+      name_pie = _.first(_.pluck(t, "columnName"));
+	  var modelType=_.first(_.pluck(t,'model'))+"."+_.first(_.pluck(t,'yAxis'));
+      totalValue_pie = sum(valueData);
+      return {
+        name: name_pie,
+        y: totalValue_pie,
+        color: Highcharts.getOptions().colors[index],
+		modelType:modelType
+      };
+    }
+  },
+  pie:{
+     2: function(t, unit,index) {
+	
       var name_pie, totalValue_pie, valueData;
       valueData = _.pluck(t, "value");
       name_pie = _.first(_.pluck(t, "columnName"));
@@ -1521,7 +1559,6 @@ model_DataConvertClass = {
    model_APIClass['tooltip']={
                       formatter: function() {
   if(typeof this.point.stackTotal ==='undefined') {
-  console.log("this.point",this);
    return '&lt;b&gt;'+ this.x +'&lt;/b&gt;&lt;br/&gt;'+
                         this.series.name +': '+ this.y +'&lt;br/&gt;';
                         
@@ -1660,7 +1697,6 @@ areaStackPercent:{
   }
   var scale =d3.scale.linear().domain([1,smpGroupbySize])
   			.range([-smpGroupbySize/2*placementCalibr,smpGroupbySize/2*placementCalibr]);
-  console.log("Index:",(index+1)," .scaleIndex",scale(index+1));
    colToSeriesArr={type:'line', name:columnNameData,
   data:valueData, 
   color: complementaryColor(Highcharts.getOptions().colors[index]),
@@ -1676,9 +1712,6 @@ areaStackPercent:{
 };
 
 
-  //$$$
- 
-  
 
 chartGen = function(smpColName, model_APIClass, output) {
     var index;
@@ -1689,16 +1722,13 @@ chartGen = function(smpColName, model_APIClass, output) {
         modelType = _.first(_.pluck(t, "model"));
         columnName = unit;
         propertyName = modelType+"_"+columnName;
-		console.log('modelType inside',modelType);
+  if (modelType==='pie') {containsModelType='pie';}
           if (typeof modelType != 'undefined') {
-            console.log("typeof", typeof modelType);
             yAxisNum = parseInt(numDivFn(_.first(_.pluck(t, 'yAxis')))) - 1;
             splitModel = model_TypeSplitClass[modelType];
                 _.each(splitModel, function(subModel, n) {
                 if (subModel !== null) {
-
                     zeroOrOne_OperableClass[n].Init(subModel, modelType, columnName, yAxisNum, unit, index, model_APIClass, output);
-				
   				 zeroOrOne_OperableClass[n].Draw(t, unit, index, output,index2);
                 }
             });
@@ -1711,16 +1741,15 @@ chartGen = function(smpColName, model_APIClass, output) {
                 modelType = _.first(_.pluck(t, "model"));
   if (modelType==='columnStackGroup') {containsModelType='columnStackGroup';}
   if (modelType==='columnInducedGroupby') {containsModelType='columnInducedGroupby';}
+ 
                 columnName = _.first(_.pluck(t, "columnName"));
                 propertyName = modelType + "_" + columnName;
                 yAxisNum = parseInt(numDivFn(_.first(_.pluck(t, 'yAxis')))) - 1;
                 splitModel = model_TypeSplitClass[modelType];
-                //console.log("splitModel", splitModel);
                 _.each(splitModel, function(subModel, n) {
                     if (subModel !== null) {
 
                         zeroOrOne_OperableClass[n].Init(subModel, modelType, columnName, yAxisNum, unit, index, model_APIClass, output);
-                        //console.log("output", output);
                         zeroOrOne_OperableClass[n].Draw(t, unit, index, output, index2);
  				
                     }
@@ -1742,7 +1771,6 @@ Set_GroupFn1 = function(data, groupCount, subModel,modelType,index2) {
     groupCountArr.forEach(function(d, i) {
         groupProp.push("groupby" + (d + 1));
     });
-    console.log("groupProp", JSON.stringify(groupProp));
     uniqCategory = _.uniq(_.pluck(data, "category"));
     nest = d3.nest();
     output = [];
@@ -1961,7 +1989,6 @@ zeroOrOne_OperableClass = {
         Init: function(subModel, modelType, columnName, yAxisNum, unit, index, model_APIClass, output, index2) {
             var propertyName;
             propertyName = modelType + "_" + columnName + "_0:" + unit;
-          
             output[propertyName] = {};
         },
         Draw: function(d, unit, index, initialized, index2) {
@@ -1969,10 +1996,7 @@ zeroOrOne_OperableClass = {
             modelType = _.first(_.pluck(d, "model"));
             columnName = _.first(_.pluck(d, "columnName"));
             propertyName = modelType + "_" + columnName + "_0:" + unit;
-			console.log('d, unit, index, index2',d, unit, index, index2);
-			console.log('mmmodelType',modelType);
             initialized[propertyName] = model_DataConvertClass[modelType][0](d, unit, index, index2);
-			console.log('initialized[propertyName]',initialized[propertyName]);
         }
     },
   1: { //for Average lines
@@ -2016,11 +2040,12 @@ zeroOrOne_OperableClass = {
                 var columnName, modelType, propertyName;
                 modelType = _.first(_.pluck(t, "model"));
                 columnName = _.first(_.pluck(t, "columnName"));
-  				
+  				yAxis=_.first(_.pluck(t, "yAxis"));
                 propertyName = modelType + "_" + columnName + "_1";
   
                 initialized[propertyName].data.push(model_DataConvertClass[modelType][1](t, unit, index));
 				initialized[propertyName]['yAxisFull']=_.first(_.pluck(t,"yAxis"));
+				initialized[propertyName]=toolTipInserter(initialized[propertyName],modelType+'.'+yAxis);
             });
 
         }
@@ -2030,6 +2055,19 @@ zeroOrOne_OperableClass = {
             var propertyName;
             propertyName = "pie";
             if (_.has(output, propertyName) == false) {
+				if(modelType=='pie'){
+				 output[propertyName] = {
+                    type: "pie",
+                    name: "pie",
+                    data: [],
+                    //center: [50, 80],
+                    size: 180,
+                    showInLegend: true,
+                    dataLabels: {
+                        enabled: false
+                    }
+				};} 
+				else { 
                 output[propertyName] = {
                     type: "pie",
                     name: "pie",
@@ -2042,6 +2080,7 @@ zeroOrOne_OperableClass = {
                     }
 
                 };
+				}
             }
         },
         Draw: function(d, unit, index, initialized) {
@@ -2049,7 +2088,14 @@ zeroOrOne_OperableClass = {
             modelType = _.first(_.pluck(d, "model"));
             columnName = _.first(_.pluck(d, "columnName"));
             propertyName = "pie";
-            initialized[propertyName].data.push(model_DataConvertClass[modelType][2](d, unit, index));
+			
+			_.each(rawdata,function(o){
+			//take from the first 2 indexes
+			var value=o[1];
+			if(typeof value=='string') value=0;
+			initialized[propertyName].data.push([o[0],value]);
+			});
+            
         }
     },
   3: { //for group and stack
@@ -2114,7 +2160,6 @@ safeRead = function() {
   return date instanceof Date && !isNaN(date.valueOf());
        },
   "month":function(d) { var date=new Date(d+" 2,2014");
-  console.log("date",date);
   return date instanceof Date && !isNaN(date.valueOf());}
   };
   
@@ -2123,7 +2168,6 @@ safeRead = function() {
   formatXTicksAndOrdering= function(modelData,view) {
   //Data preProcess
   var formatScale;
-  var testArray=["2012-11-25","Jan","Peter","Jan-2014"];
   var sampleCategory=modelData[0].category;
   var autoDetectArray=['parsableDate','month'];
   var detected;
@@ -2149,13 +2193,17 @@ var objPushCount=0;
   case 'monthString' :formatOrdering=function (d) { 
   var arr=d.category;
   var date=new Date(arr+' 15, 2014');return date.getTime()/1000}; break;
-  case 'year-month' :formatOrdering=function(d){var arr=(d.category).split('-');
+  case 'Y-b' :formatOrdering=function(d){var arr=(d.category).split('-');
   var date=new Date(arr[1]+' 15,'+arr[0]);return date.getTime()/1000}; break;
-  case 'month-year' :formatOrdering=function(d) {var arr=(d.category).split('-');
+  case 'b-Y' :formatOrdering=function(d) {var arr=(d.category).split('-');
   var date=new Date(arr[0]+' 15,'+arr[1]);return date.getTime()/1000}; break;
   case 'date': formatOrdering=function(d) {
     return (new Date(d.category)).getTime()/1000;
     };break;
+	case '%d/%m/%y':formatOrdering=function(d) { return d3.time.format(rawTimeString).parse(d.category).getTime()/1000;};break;
+	case 'week-week':formatOrdering=function(d) { return d3.time.format(rawTimeString).parse(d.category.split('-')[0]).getTime()/1000;};break;
+	case 'week':formatOrdering=function(d) { return parseInt(d.category.split('week')[1]);};break;
+	case 'Y':formatOrdering=function(d) { return parseInt(d.category);};break;
   case 'valueAscending':formatOrdering=function(d) {
     return d.value;  }; break;
   case 'valueDescending':formatOrdering=function(d) {
@@ -2175,7 +2223,6 @@ var objPushCount=0;
     if (objPushCount ==0) console.log("objpush for Formating Order",JSON.stringify(record));
   
     if (typeof formatOrdering!=='undefined'){
-  console.log("ordering:",formatOrdering(record));
    autoObj['ordering']=formatOrdering(record); 
     } 
   
@@ -2217,7 +2264,6 @@ var objPushCount=0;
   
   };
   reArrangeToSeries = function(toSeriesArray, containsModelType) {
-  console.log('containsModelType',containsModelType);
       if (containsModelType === 'columnStackGroup') { //rearrange 'output'
   var columnData = _.where(toSeriesArray,{'type':'column'});
  
@@ -2238,15 +2284,21 @@ var objPushCount=0;
   };
   tooltipInserter = function(finalObj,modelType){
   if (tooltipKey==='formatToolTip') {
-  var formatToolTip;
-  eval(formatToolTipCast);
-  for (var propertyName in formatToolTip) {
-  if (propertyName==modelType) {
-  var newObj=finalObj;
-  newObj['tooltip']=formatToolTip[propertyName];
-  finalObj=newObj;
-  }
-  }
+	  var formatToolTip;
+	  eval(formatToolTipCast);
+	  for (var propertyName in formatToolTip) {
+	  if (propertyName==modelType) {
+	  var newObj=finalObj;
+	  if(typeof formatToolTip[propertyName]!= 'function'){
+	  newObj['tooltip']=formatToolTip[propertyName];
+	  finalObj=newObj;
+	  }else if( view.typeinfo.dataGroupStartDate!='default') {
+	  
+	  model_APIClass['tooltip']={};
+	  model_APIClass['tooltip']['formatter']=formatToolTip[propertyName];
+	  }
+	  }
+	  }
   }
   return finalObj;
   };
@@ -2334,7 +2386,7 @@ operationProcesser=function(vObj){
 		sampleObj['model']=beforeId+afterId;
 		vObj['processedValue'].push(sampleObj);
 	}
-		//console.log("sampleObj",JSON.stringify(sampleObj));
+		
 	return vObj['processedValue'];
 
 };
@@ -2349,7 +2401,7 @@ valueOperating=function(modelData,valueOperationKey,formatValueOperationCast){
 		if (_.str.include(m,'?id')) {valueOpArr.push(m);
 		//if (m.contains("?id")==true) {valueOpArr.push(m);
 		var shortForm=m.substring(m.lastIndexOf("?id:")+4,m.lastIndexOf("/"));
-		console.log("check shortForm",shortForm);
+		
 		shortOpArr.push(shortForm);
 		}
 		});
@@ -2367,37 +2419,33 @@ valueOperating=function(modelData,valueOperationKey,formatValueOperationCast){
 //--end valueOperating
    dataGroupUsed = function(modelData, tCol,periodSelect_val,startDate) {
 	//reassign orderingKey
-	console.log('DGU modelData',JSON.stringify(modelData));
+	console.log('inside dataGroupUsed');
 	if(modelData[0].category==null) {modelData[0].category='04/10/2014';}
-	//orderingKey='year-'+periodSelect_val;
-	console.log("orderingKey in dataGroupUsed",orderingKey);
-      
+	
 		var dataGroupCategoryClass={
        'day':function(date,startDate){
               return d3.time.format("%d/%m/%y")(date);
               },
   'week':function(date,startDate){
 				startDate=d3.time.format(rawTimeString).parse(startDate);
-				console.log('hi',date);
-				console.log('sDate',startDate);
-        var weekArr=_.map([0,1,2,3,4,5],function(j){
-		
-        return new Date(d3.time.format('%Y')(startDate),startDate.getMonth(),startDate.getDate()-j*7);
+        var weekArr=_.map([0,1,2,3,4],function(j){
+        return new Date(d3.time.format('%Y')(startDate),startDate.getMonth(),startDate.getDate()+j*7);
         });
 
-  			var weekIndex=4;
+  			
           for(var k=0; k < 4; k++){
-        if(date< weekArr[k] && date >weekArr[k+1] && k< 4) {
-                weekIndex=k;
+        if(date< weekArr[k+1] && date >=weekArr[k]) {
+             var   weekIndex=k;
         break;}
 		
           }		
-		  var previousWeekIndex=weekIndex+1;
-		  console.log('hi',date);
-		  console.log("hio previousWeekIndex:",weekArr[previousWeekIndex], 'weekArr[weekIndex]:',weekArr[weekIndex]);
-              var returnDate= d3.time.format("%d/%m/%y")(weekArr[previousWeekIndex])
-  					+'-'+d3.time.format("%d/%m/%y")(weekArr[weekIndex]);
-				
+	
+		  var nextWeekIndex=weekIndex+1;
+	
+          /*    var returnDate= (typeof weekIndex!='undefined')? d3.time.format("%d/%m/%y")(weekArr[weekIndex])
+  					+'-'+d3.time.format("%d/%m/%y")(weekArr[nextWeekIndex]):'out'; 
+					*/
+			 var returnDate= (typeof weekIndex!='undefined')? 'week'+nextWeekIndex:'out'; 
   			return returnDate;
               },
 		     'month': function(date,startDate) {
@@ -2405,7 +2453,6 @@ valueOperating=function(modelData,valueOperationKey,formatValueOperationCast){
                 return monthFormat(date);
             },
             'year': function(date,startDate) {
-                console.log("now is year", date.getFullYear());
                 return date.getFullYear();
 
             },
