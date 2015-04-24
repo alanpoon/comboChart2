@@ -2040,11 +2040,12 @@ zeroOrOne_OperableClass = {
                 var columnName, modelType, propertyName;
                 modelType = _.first(_.pluck(t, "model"));
                 columnName = _.first(_.pluck(t, "columnName"));
-  				
+  				yAxis=_.first(_.pluck(t, "yAxis"));
                 propertyName = modelType + "_" + columnName + "_1";
   
                 initialized[propertyName].data.push(model_DataConvertClass[modelType][1](t, unit, index));
 				initialized[propertyName]['yAxisFull']=_.first(_.pluck(t,"yAxis"));
+				initialized[propertyName]=toolTipInserter(initialized[propertyName],modelType+'.'+yAxis);
             });
 
         }
